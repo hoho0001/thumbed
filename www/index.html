@@ -1,14 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
 
-    <meta http-equiv="Content-Security-Policy" content="default-src cdvfile: 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; media-src * blob: ; script-src 'self' 'unsafe-inline' fonts.googleapis.com;  img-src * cdvfile: 'self' data: gap: blob: https: ;">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="msapplication-tap-highlight" content="no">
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-    <link rel="stylesheet" type="text/css" href="css/index.css">
-    <title>Thumbed</title>
+<head>
+
+  <meta http-equiv="Content-Security-Policy" content="default-src cdvfile: 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; 
+    media-src * blob: ; 
+    script-src 'self' 'unsafe-inline' fonts.googleapis.com;  
+    img-src cdvfile: file: android-webview-video-poster: 'self' data: gap: blob: https: ;">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="viewport"
+    content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+  <link rel="stylesheet" type="text/css" href="css/index.css">
+  <title>Thumbed</title>
 </head>
 
 <body>
@@ -17,25 +21,25 @@
     <h2>Capturing Media with HTML</h2>
   </header>
   <main>
-      <main class="container">
-          <div class="container page active" id="home">
-              <h1 data-target="detail" class="pageHeader">Thumbed</h1>
-              <section class="content flexcontainer"><p>
-      <video src="" id="player"  controls muted></video>
-    </p> </section>
-    <p id="msg"></p>
-      <section id="can">
-        <canvas id="canvas"></canvas>
-        <img id="image"></img>
-    </section>
-    
-    <p><button id = "btnTake">Take Video</button></p>
-          </div>
-    
-  </main>
-  
-  <script type="text/javascript" src="cordova.js"></script>
-  <script type="text/javascript" src="js/index.js"></script>
+    <main class="container">
+      <div class="container page active" id="home">
+        <h1 data-target="detail" class="pageHeader">Thumbed</h1>
+        <section class="content flexcontainer">
+          <p><button id="btnTake">Take Video</button></p>
+          <p>
+            <video src="" id="player" controls muted></video>
+          </p>
+        </section>
+        <p id="msg"></p>
+
+
+
+      </div>
+
+    </main>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
 </body>
 
 </html>

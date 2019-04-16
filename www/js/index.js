@@ -1,7 +1,8 @@
 'use strict'
 
 let app = {
-  pictures: [],
+  permissions: null,
+  canvas: null,
   init: function () {
     if (window.hasOwnProperty("cordova")) {
       console.log("You're on a mobile device");
@@ -9,6 +10,18 @@ let app = {
     let isReady = (window.hasOwnProperty("cordova")) ? 'deviceready' : 'DOMContentLoaded';
     document.addEventListener(isReady, () => {
       console.log("ready");
+      app.permissions = cordova.plugins.permissions;
+      
+      app.permissions.requestPermission("android.permission.READ_EXTERNAL_STORAGE", function (status) {
+        console.log('success requesting READ_EXTERNAL_STORAGE permission');
+    }, function (err) {
+        console.log('failed to set permission');
+    });
+    app.permissions.requestPermission("android.permission.READ_MEDIA_IMAGES", function (status) {
+      console.log('success requesting READ_MEDIA_IMAGES permission');
+  }, function (err) {
+      console.log('failed to set permission');
+  });
     })
     document.getElementById('btnTake').addEventListener('click', app.takeVideo);
           
@@ -47,55 +60,66 @@ let app = {
     document.getElementById('msg').textContent = msg;
   },
   
-  captureImages: async function(){
+  captureImages:  function(){
     let player = document.getElementById('player')
-    let canvas = document.getElementById('canvas');
-    player.poster = "./img/Asset.png"
-    let ctx = canvas.getContext('2d');
-    canvas.width = player.videoWidth;
-    canvas.height = player.videoHeight;
+    app.canvas = document.createElement('canvas');
+    let ctx = app.canvas.getContext('2d');
+    app.canvas.width = player.videoWidth;
+    app.canvas.height = player.videoHeight;
 
     let milestone = (player.duration-1)/4;
     console.log(milestone);
     player.currentTime = 0.001;
     player.removeEventListener('canplaythrough', app.captureImages);
 
-    await setTimeout(async function(){
-      ctx.drawImage(player,0,0,player.videoWidth, player.videoHeight, 0, 0, canvas.width/2, canvas.height/2);
+     setTimeout( function(){
+      ctx.drawImage(player,0,0,player.videoWidth, player.videoHeight, 0, 0, app.canvas.width/2, app.canvas.height/2);
       player.currentTime += milestone;
     
-      await setTimeout( async function(){
-        ctx.drawImage(player,0,0,player.videoWidth, player.videoHeight, canvas.width/2, 0, canvas.width/2, canvas.height/2);
+       setTimeout(  function(){
+        ctx.drawImage(player,0,0,player.videoWidth, player.videoHeight, app.canvas.width/2, 0, app.canvas.width/2, app.canvas.height/2);
         player.currentTime += milestone;
    
-        await setTimeout( async function(){
-          ctx.drawImage(player,0,0,player.videoWidth, player.videoHeight, 0, canvas.height/2, canvas.width/2, canvas.height/2);
+         setTimeout(  function(){
+          ctx.drawImage(player,0,0,player.videoWidth, player.videoHeight, 0, app.canvas.height/2, app.canvas.width/2, app.canvas.height/2);
           player.currentTime += milestone;
 
-          await setTimeout( function(){
-             ctx.drawImage(player,0,0,player.videoWidth, player.videoHeight, canvas.width/2, canvas.height/2, canvas.width/2, canvas.height/2);
-             
+           setTimeout( function(){
+             ctx.drawImage(player,0,0,player.videoWidth, player.videoHeight, app.canvas.width/2, app.canvas.height/2, app.canvas.width/2, app.canvas.height/2);
+             //draw from canvas
+             app.makeBlob();
           }, 500);
         }, 500);
       }, 500);
     }, 500);
-    player.currentTime = 0;
-      let blob = canvas.toBlob((blob) => {
-        
-        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function (fs) {
-
-          console.log('file system open: ' + fs.name);
-          fs.root.getFile("newPersistentFile.png", { create: true, exclusive: false }, function (fileEntry) {
-      
-              console.log("fileEntry is file?" + fileEntry.isFile.toString());
-              app.writeFile(fileEntry, blob);
-
-          }, app.error);
-      
-        }, app.error);
-
-    }, 'image/png'); //create binary png from canvas contents
     
+  
+  },
+  makeBlob: function(){
+    let player = document.getElementById('player');
+    player.currentTime = 0;
+    let blob = app.canvas.toBlob((blob) => {
+      let player = document.getElementById('player');
+      let uri = window.URL.createObjectURL(blob);
+      player.poster = uri;
+      // document.getElementById('image').src = uri;
+      console.log(uri);
+      
+      window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function (fs) {
+
+        console.log('file system open: ' + fs.name);
+        fs.root.getFile("newPersistentFile.png", 
+        { create: true, exclusive: false }, 
+        function (fileEntry) {
+
+            console.log("fileEntry is file?" + fileEntry.isFile.toString());
+            app.writeFile(fileEntry, blob);
+
+        }, app.error);
+    
+      }, app.error);
+
+  }, 'image/png'); //create binary png from canvas contents
   
   },
   error: function(err){
@@ -106,8 +130,6 @@ let app = {
     fileEntry.createWriter(function (fileWriter) {
 
         fileWriter.onwriteend = function() {
-            console.log("Successful file write...");
-            console.log(fileEntry.toURL());
             let player = document.getElementById('player');
             player.poster = fileEntry.toInternalURL();
         };

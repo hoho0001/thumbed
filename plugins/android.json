@@ -7,6 +7,9 @@
     "files": {}
   },
   "installed_plugins": {
+    "cordova-plugin-android-permissions": {
+      "PACKAGE_NAME": "ca.edumedia.hoho0001.thumbed"
+    },
     "cordova-plugin-media-capture": {
       "PACKAGE_NAME": "ca.edumedia.hoho0001.thumbed"
     },
